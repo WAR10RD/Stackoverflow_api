@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stack overflow API</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.min.css'>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <script>
+   var toastMixin = Swal.mixin({
+     toast: true,
+     icon: 'success',
+     title: 'General Title',
+     animation: false,
+     position: 'top-right',
+     showConfirmButton: false,
+     timer: 3000,
+     timerProgressBar: true,
+     didOpen: (toast) => {
+       toast.addEventListener('mouseenter', Swal.stopTimer)
+       toast.addEventListener('mouseleave', Swal.resumeTimer)
+     }
+   });
+ 
+   function error_alert(content){
+     toastMixin.fire({
+       icon: 'error',
+       title: content
+     });
+   }
+   
+   function success_alert(content){
+     toastMixin.fire({
+       animation: true,
+       title: content
+     });
+   }
+ </script>
+  <body>
+   {% if messages %}
+        {% for message in messages %}
+          {% if message.tags == 'error'%}
+            <script>              
+              error_alert('{{ message.message }}')
+            </script>
+          {% endif %}
+          {% if message.tags == 'success'%}
+            <script>              
+              success_alert('{{ message.message }}')
+            </script>
+          {% endif %}
+        {% endfor %}
+{% endif %}
+    <div class="d-flex justify-content-center pb-4">
+        <h2>Get your answer here</h2>
+    </div>
+    <section class="why_section layout_padding">
+        <div class="container">
+        
+           <div class="row">
+              <!-- <div class="col-lg-8 offset-lg-2">
+                 <div class="full"> -->
+                    <form method="post" id="stack_form">
+                        {% csrf_token %}
+                       <!-- <fieldset> -->
+                        <div class="mb-3 ">
+                          <label for="page">page</label>
+                          <input type="number" id="page" value="1" name="page"  />
+                        </div>
+                        <div class="mb-3">
+                          <label for="pagesize">pagesize</label>
+                          <input type="number" id="pagesize" name="pagesize"  />
+                        </div>
+                        <div class="mb-3">
+                          <label for="fromdate">fromdate</label>
+                          <input type="date" id="fromdate" name="fromdate"  />
+                        </div>
+                        <div class="mb-3">
+                          <label for="todate">todate</label>
+                          <input type="date" id="todate" name="todate"  />
+                        </div>
+
+                     </div>
+                     <div class="mb-3">
+                           <label for="min">min</label>
+                           <input type="date" id="min" name="min" />
+                        </div>
+                        <div class="mb-3">
+                           <label for="max">max</label>
+                           <input type="date" id="max" name="max" />
+                        </div>
+                        <div class="mb-3">
+                        <select name="order" id="order" class="form-select">
+                           <option value="desc">desc</option>
+                           <option value="asc">asc</option>
+                        </select>
+                     </div>
+
+                        <div class="mb-3">
+                           <select name="sort" id="sort" class="form-select">
+                              <option value="activity">activity</option>
+                              <option value="creation">creation</option>
+                              <option value="votes">votes</option>
+                           </select>
+                           </div>
+
+                           <div class="mb-3 ">
+                              <label for="tagged">tagged</label>
+                              <input type="text" id="tagged" name="tagged"  />
+                            </div>
+
+                          <input type="submit" value="Submit" />
+                        
+                       <!-- </fieldset> -->
+                    </form>
+                    {% if page %}
+                           <button onclick="add_page()"> next page</button>
+                           <script>
+                              function add_page(){
+                                 document.getElementById('page').value = parseInt(document.getElementById('page').value) + 1
+                                 document.getElementById('stack_form').submit()
+                              }
+                           </script>
+                     {% endif %}
+                 </div>
+              </div>
+           </div>
+        </div>
+     </section>
+
+     
+     {% if data %}
+         
+         {% for each in data %}
+
+         <div class="d-flex justify-content-center"><h4> {{ each.title }} </h4>
+            
+            <hr>
+            <br>
+            <a href="{{ each.link }}"> go to question</a>
+         </div>
+        <div class="d-flex justify-content-center">
+
+         
+         <img src="{{ each.owner.profile_image }}" alt="" style="height: 50px;width:50px">
+         <label> {{ each.owner.display_name }}</label>
+         <a href="{{ each.owner.link }}" > visit them</a>
+         
+         <label > view count : {{ each.view_count }}</label>
+         <label > answer count : {{ each.answer_count }}</label>
+         <br>
+         
+      </div>    
+         {% endfor %}
+            
+     {% endif %}
+      
+     {% if post_info %}
+      
+      {% for key,value in post_info.items %}
+         <script>
+
+            if ('{{ value }}'){
+               document.getElementById('{{ key }}').value = '{{ value }}'
+
+            }
+            
+         </script>
+      {% endfor %}
+         
+     {% endif %}
+     
+  </body>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script>
+        var parameters = {"page":"number","pagesize":"number","fromdate":"date","todate":"date","order":["desc","asc"],"min":"depends","max":"depends","sort":{"activity":"date","creation":"date","votes":"number"}};
+    </script>
+    
+</html>
